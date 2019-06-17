@@ -24,6 +24,7 @@ namespace console{
         try{
           (new TestSuite())->run();
           (new PatriciaTrieTest())->run();
+          (new SuffixTreeTest())->run();
 
           std::cout << "----- end test section -----" << endl;
         } catch(TestException e) {

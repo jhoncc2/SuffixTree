@@ -42,6 +42,7 @@ public:
 		intervalIndex = 0;
 		charIndex = 0;
 		parent = NULL;
+		numberOfStrings = 0;
 	}
 
 	PatriciaTrie(char *str){
@@ -52,6 +53,7 @@ public:
 		intervalIndex = strlen(localString) -1;
 		charIndex = 0;
 		parent = NULL;
+		numberOfStrings = 0;
 	}
 
 	void insertString(char *strToInsert) {
@@ -59,7 +61,7 @@ public:
 
 		s.append(1, conf::end_char);
 //		s.insert(0, 1, conf::end_char);
-		s = string(1,conf::end_char) + s ;
+		s = string(1,conf::ini_char) + s ;
 
 		char *cstr = new char[s.length() + 1];
 		strcpy(cstr, s.c_str());
@@ -74,11 +76,11 @@ public:
 		if (strlen(localString) == 0) {
 			this->setLocalString(str);
 			this->setIntervalIndex(strlen(str)-1);
+			this->increaseNumberOfStrings();
 			return;
 		}
 
 		PatriciaTrie *t = this->findLongestPrefixNode(str);
-
 
 		t->bifurcate(str);
 	}
@@ -108,10 +110,10 @@ public:
 
 		printSubstring();
 
-		cout << "bifucating " << localString << str  << " " << diffIndex << " " << localString[diffIndex] << str[diffIndex] << endl;
 		// bifurcate
 		PatriciaTrie *t1 = createNewTrie(localString, diffIndex, intervalIndex);
 		t1->setChildren(children);
+		t1->setNumberOfStrings(this->getNumberOfStrings());
 		PatriciaTrie *t2 = createNewTrie(str, diffIndex, strlen(str)-1);
 
 		// update current Node
@@ -121,13 +123,25 @@ public:
 		short pos1, pos2;
 		pos1 = getAlphabetIndex(localString[diffIndex]);
 		pos2 = getAlphabetIndex(str[diffIndex]);
-		this->insertChildren(pos1, t1);
+		this->insertChildrenSilently(pos1, t1);
 		this->insertChildren(pos2, t2);
 	}
 
 	void insertChildren(short idx, PatriciaTrie *t) {
 		asserter(children[idx] == NULL, "already exists element at " + to_string(idx));
 		children[idx] = t;
+		t->increaseNumberOfStrings();
+	}
+
+	void insertChildrenSilently(short idx, PatriciaTrie *t) {
+		asserter(children[idx] == NULL, "already exists element at " + to_string(idx));
+		children[idx] = t;
+	}
+
+	void increaseNumberOfStrings(){
+		numberOfStrings += 1;
+		if(!isRoot())
+			parent->increaseNumberOfStrings();
 	}
 
 	void printTrie() {
@@ -144,8 +158,11 @@ public:
 	}
 
 	void printSubstring() {
-		cout << std::string(charIndex, '.') << '<' << charIndex << ',' << intervalIndex <<'>'
-						<< nodeSubstring() << endl;
+		cout << std::string(charIndex, '.')
+					<< '<' << charIndex
+						<< ',' << intervalIndex
+						<< ',' << numberOfStrings << '>'
+					<< nodeSubstring() << endl;
 	}
 
 	string nodeSubstring() {
@@ -195,16 +212,12 @@ public:
 		return this;
 	}
 
-
-
 	void updateNumberOfStrings(){
 		numberOfStrings == numberOfStrings + 1 ;
 		if (!isRoot()) {
 			parent->updateNumberOfStrings();
 		}
 	}
-
-
 
 	void setParent(PatriciaTrie *t) {
 		parent = t;
@@ -309,4 +322,11 @@ public:
 		return counter;
 	}
 
+	int getNumberOfStrings() const {
+		return numberOfStrings;
+	}
+
+	void setNumberOfStrings(int numberOfStrings = 0) {
+		this->numberOfStrings = numberOfStrings;
+	}
 };

@@ -10,7 +10,9 @@ public:
 		testBasic();
 		testBasic2();
 		testInsert();
+
 	}
+
 
 	void testBasic2(){
 		setContext(__func__);
@@ -74,28 +76,42 @@ public:
 
 		t->insertString("romane");
 
-
 		assertTrue(t->numberOfNodes() == 1);
+		assertTrue(t->getNumberOfStrings() == 1);
 		t->insertString("romane"); //already inserted
 		assertTrue(t->numberOfNodes() == 1);
+		assertTrue(t->getNumberOfStrings() == 1);
 //		//
 		t->insertString("romanus");
 		assertTrue(t->numberOfNodes() == 3);
+		assertTrue(t->getNumberOfStrings() == 2);
 		t->insertString("romulus");
+		assertTrue(t->getNumberOfStrings() == 3);
 		t->insertString("rubens");
-
+		assertTrue(t->getNumberOfStrings() == 4);
 		t->insertString("rubenson");
-
+		assertTrue(t->getNumberOfStrings() == 5);
 		t->insertString("ruber");
+		assertTrue(t->getNumberOfStrings() == 6);
 		t->insertString("rubicon");
+		assertTrue(t->getNumberOfStrings() == 7);
 		t->insertString("rubicundus");
-		t->printTrie();
+		assertTrue(t->getNumberOfStrings() == 8);
+//		t->printTrie();
 		t->insertString("ruba");
+		assertTrue(t->getNumberOfStrings() == 9);
 		t->insertString("rub");
+		assertTrue(t->getNumberOfStrings() == 10);
+
+		t->insertString("pub");
+		assertTrue(t->getNumberOfStrings() == 11);
+		t->insertString("pop");
+		assertTrue(t->getNumberOfStrings() == 12);
 
 		t->printTrie();
 
-		cout << t->getWidth() <<endl;
-		assertTrue(t->getWidth() == 9);
+//		cout << t->getWidth() <<endl;
+		assertTrue(t->getWidth() == 12);
+		assertTrue(t->getNumberOfStrings() == 12);
 	}
 };
