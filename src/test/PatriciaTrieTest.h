@@ -1,7 +1,8 @@
 using namespace std;
 #include <string>
+#include <vector>
 
-class PatriciaTreeTest: public TestSuite {
+class PatriciaTrieTest: public TestSuite {
 public:
 
 	/**********write tests*************/
@@ -21,11 +22,17 @@ public:
 		assertTrue(str2 == str);
 		assertTrue(str2 == str3);
 
+		vector<PatriciaTrie*> list;
+		list.resize(12);
+		assertTrue(list.size() == 12);
+		for (int i =0; i < list.size(); i ++)
+			assertTrue(list[i] == NULL);
+
 //		cout << &(str2[0]) << "-" << &(str[0])  << endl;
 //		cout << &str2 << "-" << &str  << endl;
 
-//		PatriciaTree *t1 = new PatriciaTree();
-//		PatriciaTree *t2 = t1;
+//		PatriciaTrie *t1 = new PatriciaTrie();
+//		PatriciaTrie *t2 = t1;
 //		cout << t1 << "-" << t2  << endl;
 //		cout << &t1 << "-" << &t2  << endl;
 
@@ -41,43 +48,54 @@ public:
 //		cout << (int)str[1] << endl;
 //		cout << (int) 'z' << endl;
 
-		PatriciaTree *t = new PatriciaTree();
-		assertTrue(t->findUnmatchedCharIndex("qwerty", "qwerty", 0, 6) == -1);
-		assertTrue(t->findUnmatchedCharIndex("qwerty", "qw2rty", 0, 6) == 2);
-		assertTrue(t->findUnmatchedCharIndex("qwerty", "qwe", 0, 6) == 3);
+		PatriciaTrie *t = new PatriciaTrie();
+		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qwerty$", 0, 6) == -1);
+		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qw2rty$", 0, 6) == 2);
+		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qwe$", 0, 6) == 3);
+		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qwe$", 0, 3) == -1);
+		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qwe$", 0, 4) == 3);
+		assertTrue(t->findUnmatchedCharIndex("`qwerty`", "`qwe`", 0,8) == 4);
+		assertTrue(t->findUnmatchedCharIndex("`qwe`","`qwerty`",  0,8) == 4);
 
-		assertTrue(t->getAlphabetIndex('a') == 0);
-		assertTrue(t->getAlphabetIndex('p') == 15);
+		cout << "sdafas " << endl;
+
+		assertTrue(t->getAlphabetIndex('a') == 1);
+		cout << t->getAlphabetIndex('$') << endl;
+		cout << ((short)'a') << " - " << ((short)'`') << endl;
+		assertTrue(t->getAlphabetIndex('`') == 0);
+		assertTrue(t->getAlphabetIndex('p') == 16);
 	}
 
 	void testInsert() {
 		setContext(__func__);
-		PatriciaTree *t = new PatriciaTree(false);
+		PatriciaTrie *t = new PatriciaTrie();
 		assertTrue(t->numberOfNodes() == 1); //root
-		cout << t->getWidth() <<endl;
 		assertTrue(t->getWidth() == 0);
 
 		t->insertString("romane");
-		assertTrue(t->numberOfNodes() == 2);
-		cout << t->numberOfNodes() <<endl;
+
+
+		assertTrue(t->numberOfNodes() == 1);
 		t->insertString("romane"); //already inserted
-		assertTrue(t->numberOfNodes() == 2);
-		//
+		assertTrue(t->numberOfNodes() == 1);
+//		//
 		t->insertString("romanus");
 		assertTrue(t->numberOfNodes() == 3);
-
 		t->insertString("romulus");
 		t->insertString("rubens");
+
 		t->insertString("rubenson");
+
 		t->insertString("ruber");
 		t->insertString("rubicon");
 		t->insertString("rubicundus");
+		t->printTrie();
+		t->insertString("ruba");
+		t->insertString("rub");
 
+		t->printTrie();
 
 		cout << t->getWidth() <<endl;
 		assertTrue(t->getWidth() == 9);
-//		//assertTrue(t.getHeight() == 3);
-//
-//		cout << "hello world!!";
 	}
 };

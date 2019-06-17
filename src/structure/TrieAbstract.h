@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <string>
+#include <stdexcept>
 
 using namespace std;
 
@@ -14,4 +15,12 @@ public:
 	virtual TrieAbstract *getRoot(){}
 	virtual int getHeight(){}
 
+	/**
+	 * asserts booleans, for expected behavior
+	 */
+	virtual void asserter(bool boolean, string msg){
+		if (!boolean){
+	        throw std::invalid_argument("\n{asserter error} unexpected value : " + msg);
+		}
+	}
 };

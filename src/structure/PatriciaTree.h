@@ -14,16 +14,38 @@ public:
 	short charIndex = 0;
 	char *localString; //
 	bool leaf;
+	int numberOfStrings = 0;
 
 	vector <PatriciaTree*> children; // 26 children
 
 	PatriciaTree(){
 		children.resize(conf::univ_size);
-		cout << children.size() << endl;
 		localString = "";
 		short charIndex = 0;
 		parent = NULL;
 		leaf = true;
+	}
+
+	PatriciaTree(bool isLeaf) {
+		children.resize(conf::univ_size);
+		localString = "";
+		short charIndex = 0;
+		parent = NULL;
+		leaf = isLeaf;
+	}
+
+	void findLeafAndInsert(char *str, short idx) {
+		PatriciaTree *t = findPrefixNode(str, idx);
+
+		if (t->isRoot()) {
+			createNewLeaf(str);
+		} else if (t->isLeaf()) {
+			if (idx+1 == strlen(str)) {
+				return;
+			} else {
+
+			}
+		}
 	}
 
 	/**
@@ -34,47 +56,58 @@ public:
 	}
 
 	void findPrefixNodeAndInsert(char *str, int idx) {
-		short pos = getAlphabetIndex(str[idx + nextCharDist]);
-		if ((idx + nextCharDist) >= strlen(str)// no enough room for comparison
-				|| children[pos] == NULL //next node in the tree is not correct
-			) {
-			short diffIndex = findUnmatchedCharIndex(localString, str, idx, idx + nextCharDist);
-			this->createNodeAtIndex(str, diffIndex);
-		} else {
-			short diffIndex = findUnmatchedCharIndex(localString, str, idx, idx + nextCharDist);
-			if (diffIndex == -1)
-				findPrefixNodeAndInsert(str, idx + nextCharDist); // continue finding in other nodes
-			else
-				createNodeAtIndex(str, diffIndex);
-		}
-	}
-
-	void createNodeAtIndex(char *str, short diffIndex){
-		short pos = getAlphabetIndex(str[diffIndex]);
-		if(diffIndex == 0 && isRoot()) {
-			PatriciaTree *l = this->createNewLeaf(str, diffIndex);
-			children[pos] = l;
-			cout << " here " << children.size() << endl;
-		} else if (diffIndex == -1 && isLeaf() && strlen(str) == charIndex + nextCharDist) {
+		// aphaPos is either idx + 0 for leaf and root
+		// or idx + nextCharDist
+		short alphPos = getAlphabetIndex(str[idx+ nextCharDist]);
+		if (isRoot() && children[alphPos] == NULL){
+			PatriciaTree *l = createNewLeaf(str);
+			children[alphPos] = l;
+		} else if (isLeaf() && strlen(str) == (idx+1)) {
 			return;
-		}else if (diffIndex == -1 && isLeaf() && strlen(str) > charIndex + nextCharDist) {
-			PatriciaTree *l = this->createNewLeaf(str, diffIndex);
-			this->setNextCharDist(diffIndex - (charIndex-1));
-			children[str[diffIndex]] = l;
-		} else if (diffIndex < charIndex + nextCharDist) { // new string cutting branches
-			this->bifurcateWithString(str, diffIndex);
+		} else if (isLeaf() && strlen(str) > (idx+1)) {
+			PatriciaTree *l = createNewLeaf(str);
+			short diffIndex = strlen(str)-1;
+			// update trie
+			children[alphPos] = l;
+			short leafPos = getAlphabetIndex(str[diffIndex]);
+			this->setNextCharDist(leafPos);
+		} else if (children[alphPos] == NULL
+				|| strlen(str) <= idx + nextCharDist){
+			short diffIndex = findUnmatchedCharIndex(localString, str, idx, idx + nextCharDist);
+			bifurcateWithString(str, diffIndex);
+		} else if (children[alphPos] != NULL){
+			short diffIndex = findUnmatchedCharIndex(localString, str, idx, idx + nextCharDist);
+			if (diffIndex != -1){
+				bifurcateWithString(str, diffIndex);
+			} else {
+				findPrefixNodeAndInsert(str, idx + nextCharDist);
+			}
 		} else {
-			cout << "[error] undefined case: " << str << " :  "<< diffIndex << endl;
+			cout << "{error in creation} unexpected case" << endl;
 		}
 	}
 
-	PatriciaTree *createNewLeaf(char *str, short breakIdx) {
+	void updateNumberOfStrings(){
+		numberOfStrings == numberOfStrings + 1 ;
+		if (!isRoot()) {
+			parent->updateNumberOfStrings();
+		}
+	}
+
+
+	/**
+	 * Each node leaf poins at the last char of the string
+	 */
+	PatriciaTree *createNewLeaf(char *str) {
 		PatriciaTree *t = new PatriciaTree();
-		t->setCharIndex(breakIdx);
+		t->setCharIndex(strlen(str) -1);
 		t->setNextCharDist(0);
+
 		t->setLocalString(str);
+		t->setIsLeaf(true);
 
 		t->setParent(this);
+		t->updateNumberOfStrings();
 
 		return t;
 	}
@@ -96,11 +129,8 @@ public:
 		t->setLocalString(localString);
 
 		// new child with new string
-		PatriciaTree *t2 = new PatriciaTree();
-		t2->setCharIndex(breakIdx);
-		t2->setNextCharDist(0);
-		t2->setLocalString(str);
-		t2->setIsLeaf(true);
+		PatriciaTree *t2 = createNewLeaf(str);
+
 		// t2->setChildren(); // no children: leaf
 
 		// Updtea current node
@@ -139,9 +169,6 @@ public:
 		return parent;
 	}
 
-
-
-
 	/*old version*/
 
 	bool isFinalToken(char c) {
@@ -168,9 +195,6 @@ public:
 	 * if a is shorter than end then returns the size of the string (analogous for b)
 	 */
 	short findUnmatchedCharIndex(string stra, string strb, short ini, short end) {
-		if(stra.size() == 0 || strb.size() ==0)
-			return ini;
-
 		short res = -1; // completely equals
 		short limit = end;
 		if(limit > stra.size()) {
@@ -213,7 +237,6 @@ public:
 
 	int numberOfNodes() {
 		int res = 1;
-		cout << children.size() << endl;
 		for (int i = 0; i < children.size() ; ++i) {
 			if(children[i] != NULL) {
 
@@ -222,6 +245,18 @@ public:
 			}
 		}
 		return res;
+	}
+
+	int getWidth(){
+		int counter = 0;
+		if(isLeaf())
+			counter = counter + 1;
+
+		for (short i =0; i< children.size() ; i ++){
+			if (children[i] != NULL)
+				counter = counter + children[i]->getWidth();
+		}
+		return counter;
 	}
 
 };

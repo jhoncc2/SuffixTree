@@ -23,7 +23,7 @@ namespace console{
         std::cout << "----- running tests -----" << endl;
         try{
           (new TestSuite())->run();
-          (new PatriciaTreeTest())->run();
+          (new PatriciaTrieTest())->run();
 
           std::cout << "----- end test section -----" << endl;
         } catch(TestException e) {
