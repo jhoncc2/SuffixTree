@@ -4,115 +4,175 @@ using namespace std;
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <math.h>
+
+
 
 class ExperimentEnglish : public BaseExperiment {
 
 public:
 
-  string filename = "result_data/random.txt";
-
-  	struct Information{
-		string name;
-		string time;
-		string writings;
-  	};
-
-	void run(string outFolder) {
+	void run(string inputFile, string outFolder) {
 		// configuration of sencond memory
-//		this->multipleCount(outFolder);
+
+		cout << "running experiment enlish " <<endl;
+		conf::use_universe(conf::text_universe);
+		char *text = readFile(inputFile);
+		cout <<inputFile << text << endl;
+
+		this->runMultiple(text, outFolder);
+		cout << "finished experiment enlish " <<endl;
 	}
 
-	void multipleCount() {
+	/**
+	 * read first line of a inputfile
+	 * expected single line text
+	 */
+	char* readFile(string filename){
+		ifstream file;
+		string line;
+		file.open(filename.c_str(), ios::in);
+		// reading header [remove]
+		getline(file, line);
+		cout << line << endl;
+		file.close();
 
+		char *cstr = new char[line.length() + 1];
+		strcpy(cstr, line.c_str());
+
+		return cstr;
 	}
 
-//  void runExperiments() {
-//    vector<Information> resultData;
-//    // run experiments
-//    int start = 9;
-//    int exps = 20;
-//
-//    cout << "********CONST_LINEAR_SPLIT********" << endl;
-//
-//    conf::CONST_SECOND_MEMORY = true;
-//    conf::CONST_SPLIT_HEURISTIC = conf::CONST_LINEAR_SPLIT;
-//    RTree *root = new RTreeLeaf();
-//    for (int i = start; i < exps ; ++i) {
-//      Information inf;
-//      conf::writingCounter = 0;
-//      this->startTimer();
-//      for (int j = 0; j < exps ; ++j) {
-//        insertRandomRectangles(root, pow(2,i));
-//      }
-//      inf.name = "2^" + to_string(i);
-//      inf.time = this->stopTimer();
-//      inf.writings = to_string(conf::writingCounter);
-//      resultData.push_back(inf);
-//    }
-//    this->printResults(filename, "linear", resultData);
-//
-//    // quadratic
-//    cout << "********CONST_QUADRATIC_SPLIT********" << endl;
-//    conf::CONST_SECOND_MEMORY = true;
-//    conf::CONST_SPLIT_HEURISTIC = conf::CONST_QUADRATIC_SPLIT;
-//    root = new RTreeLeaf();
-//    for (int i = start; i < exps ; ++i) {
-//      Information inf;
-//      conf::writingCounter = 0;
-//      this->startTimer();
-//      for (int j = 0; j < exps ; ++j) {
-//        insertRandomRectangles(root, pow(2,i));
-//      }
-//      inf.name = "2^" + to_string(i);
-//      inf.time = this->stopTimer();
-//      inf.writings = to_string(conf::writingCounter);
-//      resultData.push_back(inf);
-//    }
-//    this->printResults(filename, "quadratic", resultData);
-//    // root = insertRandomRectangles(root, numberOfRect);
-//  }
-//
-//  void printResults(string filename, string title, vector<Information> data) {
-//    fstream output;
-//    output.open(filename,  ios::out | ios::app);
-//
-//    string a= "", b= "", c="";
-//    for (int i = 0; i < data.size(); ++i) {
-//      a = a + data[i].name + ", ";
-//      b = b + data[i].time + ", ";
-//      c = c + data[i].writings + ", ";
-//    }
-//    // string as = a.str();
-//    // string bs = b.str();
-//    // string cs = c.str();
-//
-//    cout << a << endl;
-//    cout << b << endl;
-//    cout << c << endl;
-//
-//    cout << "M:" << conf::CONST_M
-//          << " - " << "LEAF_M:" << conf::CONST_LEAF_M << endl;
-//
-//    cout << conf::CONST_SPLIT_HEURISTIC
-//      << " " << conf::writingCounter
-//      << " " << conf::CONST_SECOND_MEMORY << endl;
-//
-//    output << endl << title << endl;
-//    output << "M:" << conf::CONST_M
-//          << " - " << "LEAF_M:" << conf::CONST_LEAF_M << endl;
-//    output << a << endl;
-//    output << b << endl;
-//    output << c << endl;
-//
-//    output.close();
-//  }
-//
-//  RTree* insertRandomRectangles(RTree *root, int num) {
-//    RTree *newRoot = root;
-//    for (int i = 0; i < num; ++i) {
-//      newRoot = root->insertRectangle(Rectangle::createRandom());
-//     }
-//    return newRoot;
-//  }
+	void runMultiple(char *text, string outFolder) {
+		fstream output;
+		string filename = outFolder + "englishCountLocate.txt";
+		output.open(filename, ios::out);
+
+		fstream outputTop;
+		string filename2 = outFolder + "englishTopkq.txt";
+		outputTop.open(filename2, ios::out);
+
+		SuffixTree *t;
+		int ini = 10;
+		int end = 23;
+		for (int i=ini; i<=end; i ++) {
+			t = new SuffixTree();
+
+			int size = pow(2,i);
+			if (size >= strlen(text) ){
+				break;
+			}
+
+			// build suffix tree
+			cout << "processing n=" << size << endl;
+			output << "processing n=" << size << endl;
+			t->buildRange(text, 0, size);
+			cout << "finished building tree" << endl;
+
+			// run experiments
+			runCountAndLocate(t, text, size, output);
+			runTopkq(t, size, outputTop);
+		}
+		output.close();
+	}
+
+//	void runSingleWith(SuffixTree *t, char *text,  int n, fstream &out){
+//		runCountAndLocate(t, text, n, out);
+//	}
+
+	void runTopkq(SuffixTree *t, int size, fstream &out){
+		int arrk[] = {3,5,10};
+		int arrq[] = { 4, 5, 6, 7 };
+
+		vector<int> ks(arrk, arrk + sizeof(arrk) / sizeof(arrk[0]));
+		vector<int> qs(arrq, arrq + sizeof(arrq) / sizeof(arrq[0]));
+
+		out << "k\\q-> \t 4 \t 5 \t 6 \t 7" << endl;
+
+		double times = runTopkqInd(t, size, ks, qs, out);
+
+		out << "total: "<< times << endl;
+	}
+
+	double runTopkqInd(SuffixTree *t, int size, vector<int> ks, vector<int> qs, fstream &out){
+//		out << "number : " << endl;
+		double res;
+
+		double sum = 0;
+		double lapse;
+		for (int i = 0; i < ks.size(); i++) {
+			out << ks[i] << "\t";
+			for (int j = 0; j < qs.size(); j++) {
+				startTimer();
+				t->topkq(ks[i], qs[j]);
+				lapse = stopTimer();
+				sum += lapse;
+				out << lapse << "\t" ;
+			}
+			out << endl;
+		}
+
+
+		return sum;
+	}
+
+	void runCountAndLocate(SuffixTree *t, char* text, int n, fstream &out){
+		// for locate and riun
+		vector<char*> rwords = findRandom(text, n/10);
+		out << n << "\t" ;
+		runCount(t, rwords, out);
+		runLocate(t, rwords, out);
+		out << endl;
+	}
+
+	void runCount(SuffixTree *t, vector<char*> rwords, fstream &out){
+		startTimer();
+		for (int i = 0; i < rwords.size(); i++) {
+			t->count(rwords[i]);
+		}
+		double lapse = stopTimer();
+		out << lapse << "\t" ;
+	}
+
+	void runLocate(SuffixTree *t, vector<char*> rwords, fstream &out){
+		startTimer();
+		for (int i = 0; i < rwords.size(); i++) {
+			t->locate(rwords[i]);
+		}
+		double lapse = stopTimer();
+		out << lapse << "\t";
+	}
+
+	vector <char*> findRandom(char *text, int size) {
+		vector<char*> res;
+		int tlenght = strlen(text);
+		int rval, ini, end;
+		for (int i = 0; i < size; i++) {
+			ini = rand() % tlenght;
+			while(text[ini] != ' ')
+				ini++;
+			ini ++;
+			end = ini;
+
+			while(text[end] != ' ')
+				end++;
+
+			res.push_back(substringOf(text, ini, end-ini));
+		}
+		return res;
+	}
+
+	char *substringOf(char* str, int ini, int end) {
+		string s(str);
+		string st = "";
+
+		for (int i = ini; i < end; i++) {
+			st += str[i];
+		}
+
+		char *cstr = new char[st.length() + 1];
+		strcpy(cstr, st.c_str());
+		return cstr;
+	}
 
 };

@@ -78,7 +78,7 @@ public:
 				continue;
 			}
 
-			if (conf::ascii_table[(int)tc] != -1)
+			if (conf::universe[(int)tc] != -1)
 				res += tc;
 		}
 		return res;

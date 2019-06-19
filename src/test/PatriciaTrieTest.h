@@ -7,6 +7,9 @@ public:
 
 	/**********write tests*************/
 	void run() {
+		// setup context in conf
+		conf::use_universe(conf::alph_universe);
+
 		testBasic();
 		testBasic2();
 		testInsert();
@@ -60,13 +63,16 @@ public:
 		assertTrue(t->findUnmatchedCharIndex("`qwe`","`qwerty`",  0,8) == 4);
 		assertTrue(t->findUnmatchedCharIndex("`qwe","`qwerty`",  0,8) == 4);
 
-		cout << "sdafas " << endl;
 
-		assertTrue(t->getAlphabetIndex('a') == 1);
-		cout << t->getAlphabetIndex('$') << endl;
-		cout << ((short)'a') << " - " << ((short)'`') << endl;
-		assertTrue(t->getAlphabetIndex('`') == 0);
-		assertTrue(t->getAlphabetIndex('p') == 16);
+
+		// context alphabet universe
+		assertTrue(conf::universe_descriptor[(int)'a'] == 0);
+		cout << "sdafas " << endl;
+		assertTrue(t->getUniverseIndex('a') == 0);
+//		cout << t->getUniverseIndex('$') << endl;
+		cout << ((short)'p') << " - " << ((short)'`') << endl;
+		assertTrue(t->getUniverseIndex('`') == conf::alph_universe.size());
+		assertTrue(t->getUniverseIndex('p') == 15);
 	}
 
 	void testInsert() {

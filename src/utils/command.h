@@ -41,6 +41,18 @@ namespace console{
 			cout << "input: " << fin << " output: " << fout << endl;
 			(new TextPreprocessing())->loadAndRemoveChars(fin, fout);
 
+		} else if (exist(argv, argv + argc, "--run-experiment")
+				&& exist(argv, argv + argc, "--out-folder")
+				&& exist(argv, argv + argc, "--data")) {
+
+			string type = console::get(argv, argv + argc, "--run-experiment");
+			string output = console::get(argv, argv + argc, "--out-folder");
+			string data = console::get(argv, argv + argc, "--data");
+			std::cout << "----- experiment command -----" << endl;
+
+			if (type == "english")
+				(new ExperimentEnglish())->run(data, output);
+
 		} else if (exist(argv, argv + argc, "--exp-random")) {
 	//        (new RandomExperiment())->run();
 		}

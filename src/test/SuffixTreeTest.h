@@ -9,18 +9,19 @@ public:
 
 	/**********write tests*************/
 	void run() {
+		conf::use_universe(conf::alph_universe);
 		testBasic();
 		testBuild();
 		testCount();
 		testLocate();
 		testTopKQ();
-//		testTextfile();
+		testTextfile();
 	}
 
 	void testTextfile() {
 		setContext(__func__);
 		char *text = "asdj lajsdlfjalsdj a ljasdk jiwem la ijao jlakjod ja 12 12 2  2 2";
-//		conf::universe = conf::english_universe;
+		conf::use_universe(conf::text_universe);
 
 		SuffixTree *t = new SuffixTree();
 		t->build(text);

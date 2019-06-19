@@ -25,8 +25,13 @@ class SuffixTree : public PatriciaTrie {
 
 public:
 
-	void build(char* text) {
+	void build(char * text){
+		buildRange(text, 0, strlen(text));
+	}
+	void buildRange(char* text, int ini, int limit) {
 //		tree = new PatriciaTrie();
+		asserter(ini >= 0, "initial index no valid {build suffix tree}");
+		asserter(limit <= strlen(text), "limit no valid {build suffix tree}");
 
 		int end = strlen(text);
 		PatriciaTrie *t = this->insertString(text);

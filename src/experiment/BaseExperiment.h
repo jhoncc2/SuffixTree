@@ -30,7 +30,7 @@ public:
     cini = std::clock();
   }
 
-  string stopTimer() {
+  double stopTimer() {
     cend = std::clock();
     tend = high_resolution_clock::now();
     
@@ -41,7 +41,7 @@ public:
     // cout << duration << '\t';
 
     cout << "duration: " << durationCpu << endl;
-    return to_string(durationCpu / 1000.0);
+    return durationCpu / 1000.0;
   }
   
 };

@@ -32,7 +32,7 @@ public:
 	char *localString; //
 
 	vector <PatriciaTrie*> children; // children
-	short charIndex, intervalIndex;
+	long charIndex, intervalIndex;
 
 	vector <int> occurrences; // stored index of substring occurrences (prefix)
 
@@ -67,7 +67,7 @@ public:
 		// compare localstring with str
 
 		int idx = findUnmatchedCharIndex(localString, str, charIndex, intervalIndex + 1);
-		short strSize = strlen(str);
+		long strSize = strlen(str);
 		if (idx != -1)
 			if (idx == strSize)
 				return this;
@@ -77,7 +77,7 @@ public:
 			if (intervalIndex +1 == strSize)
 				return this;
 
-		short pos = getAlphabetIndex(str[intervalIndex +1]);
+		long pos = getUniverseIndex(str[intervalIndex +1]);
 		if (children[pos] == NULL)
 			return NULL;
 
@@ -145,7 +145,7 @@ public:
 	}
 
 	PatriciaTrie *bifurcate(char *str) {
-		short diffIndex = getUnmatchedChar(str);
+		long diffIndex = getUnmatchedChar(str);
 		// Already in trie
 		if (diffIndex == -1){
 			if (isLeaf() && strlen(str) == strlen(localString)){
@@ -159,7 +159,7 @@ public:
 //				localString = tmp;
 //			}
 
-			short pos = getAlphabetIndex(str[intervalIndex+1]);
+			long pos = getUniverseIndex(str[intervalIndex+1]);
 			if (children[pos] == NULL) {
 				PatriciaTrie *t = createNewTrie(str, intervalIndex+1, strlen(str)-1);
 				return insertChildren(pos, t);
@@ -178,25 +178,26 @@ public:
 		this->setIntervalIndex(diffIndex-1);
 		this->setChildren(createVectorUniverse()); // empty vector
 
-		short pos1, pos2;
-		pos1 = getAlphabetIndex(localString[diffIndex]);
-		pos2 = getAlphabetIndex(str[diffIndex]);
+		long pos1, pos2;
+		pos1 = getUniverseIndex(localString[diffIndex]);
+		pos2 = getUniverseIndex(str[diffIndex]);
 		this->insertChildrenSilently(pos1, t1);
 		this->insertChildren(pos2, t2);
 
 		return t2;
 	}
 
-	PatriciaTrie *insertChildren(short idx, PatriciaTrie *t) {
+	PatriciaTrie *insertChildren(long idx, PatriciaTrie *t) {
 		asserter(children[idx] == NULL, "already exists element at " + to_string(idx));
 		children[idx] = t;
 		t->increaseNumberOfStrings();
 		return t;
 	}
 
-	void insertChildrenSilently(short idx, PatriciaTrie *t) {
-		asserter(children[idx] == NULL, "already exists element at " + to_string(idx));
+	PatriciaTrie *insertChildrenSilently(long idx, PatriciaTrie *t) {
+		asserter(children[idx] == NULL, "silent - already exists element at " + to_string(idx));
 		children[idx] = t;
+		return t;
 	}
 
 	void increaseNumberOfStrings(){
@@ -249,7 +250,7 @@ public:
 	/**
 	 * Each node leaf poins at the last char of the string
 	 */
-	PatriciaTrie *createNewTrie(char *str, short idx, short intervalIndex) {
+	PatriciaTrie *createNewTrie(char *str, long idx, long intervalIndex) {
 		PatriciaTrie *t = new PatriciaTrie(str);
 		t->setCharIndex(idx);
 		t->setIntervalIndex(intervalIndex);
@@ -260,11 +261,11 @@ public:
 		return t;
 	}
 
-	void setIntervalIndex(short ic) {
+	void setIntervalIndex(long ic) {
 		intervalIndex = ic;
 	}
 
-	short getUnmatchedChar(char *str) {
+	long getUnmatchedChar(char *str) {
 		return findUnmatchedCharIndex(localString, str, charIndex, intervalIndex+1);
 	}
 
@@ -275,10 +276,10 @@ public:
 		if(intervalIndex < strlen(str)
 			&& str[intervalIndex] == localString[intervalIndex]) {
 			if(intervalIndex + 1 < strlen(str)
-				&& children[getAlphabetIndex(str[intervalIndex + 1])] != NULL
+				&& children[getUniverseIndex(str[intervalIndex + 1])] != NULL
 				&& this->getUnmatchedChar(str) == -1){
 
-				return children[getAlphabetIndex(str[intervalIndex + 1])]->findLongestPrefixNode(str);
+				return children[getUniverseIndex(str[intervalIndex + 1])]->findLongestPrefixNode(str);
 			}
 		}
 
@@ -298,16 +299,31 @@ public:
 
 	vector<PatriciaTrie*> createVectorUniverse(){
 		vector<PatriciaTrie*> v;
-		v.resize(conf::univ_size);
-		asserter(v.size() == conf::univ_size, "unexpected {resize on vector not working}");
+		v.resize(conf::universe.size());
+		asserter(v.size() == conf::universe.size(), "unexpected {resize on vector not working}");
 		return v;
+	}
+
+	/**
+	 * returns the index related to the universe
+	 * universe is configured in file conf
+	 */
+	long getUniverseIndex(char a) {
+		return conf::universe_descriptor[(short) a];
+	}
+
+	/**
+	 * Deprecated
+	 */
+	long getAlphabetIndex(char a) {
+		return ((short)a) - conf::char_diff;
 	}
 
 	void setLocalString(char *str) {
 //		strcpy(localString, str.c_str());
 		localString = str;
 	}
-	void setCharIndex(short index) {
+	void setCharIndex(long index) {
 		charIndex = index;
 	}
 	void setChildren(vector <PatriciaTrie*> childn) {
@@ -327,17 +343,13 @@ public:
 		return c == conf::end_char;
 	}
 
-	short getAlphabetIndex(char a) {
-		return ((short)a) - conf::char_diff;
-	}
-
 	/**
 	 * return the char index that does not match between strings a and b
 	 * if a is shorter than end then returns the size of the string (analogous for b)
 	 */
-	short findUnmatchedCharIndex(string stra, string strb, short ini, short end) {
-		short res = -1; // completely equals
-		short limit = end;
+	long findUnmatchedCharIndex(string stra, string strb, long ini, long end) {
+		long res = -1; // completely equals
+		long limit = end;
 		if(limit > stra.size()) {
 			limit = stra.size();
 			if (stra.size() > strb.size())
@@ -345,7 +357,7 @@ public:
 			res = limit; // one string is shorter for the comparison
 		}
 
-		for(short i = ini; i < limit; i ++) {
+		for(long i = ini; i < limit; i ++) {
 			if(stra [i] != strb[i]) {
 				return i;
 			}
@@ -388,7 +400,7 @@ public:
 		if(isLeaf())
 			counter = counter + 1;
 
-		for (short i =0; i< children.size() ; i ++){
+		for (long i =0; i< children.size() ; i ++){
 			if (children[i] != NULL)
 				counter = counter + children[i]->getWidth();
 		}

@@ -38,8 +38,7 @@ using namespace std;
 
 
 int main (int argc, char *argv[]) {
-	conf::generate_ascii_table();
-    // try
+	// try
     // {
         return console::handlecommands(argc, argv);
     // }
