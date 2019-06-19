@@ -1,3 +1,4 @@
+#include <utility>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -30,8 +31,7 @@ public:
 
 	char *localString; //
 
-	vector <PatriciaTrie*> children; // 26 children
-	vector <short> intervals; // 26 children
+	vector <PatriciaTrie*> children; // children
 	short charIndex, intervalIndex;
 
 	vector <int> occurrences; // stored index of substring occurrences (prefix)
@@ -39,8 +39,8 @@ public:
 	int numberOfStrings = 0;
 
 	PatriciaTrie(){
-		children.resize(conf::univ_size);
-		intervals.resize(conf::univ_size);
+//		children.resize(conf::univ_size);
+		children = createVectorUniverse();
 
 		localString = "";
 		intervalIndex = 0;
@@ -51,7 +51,6 @@ public:
 
 	PatriciaTrie(char *str){
 		children.resize(conf::univ_size);
-		intervals.resize(conf::univ_size);
 
 		localString = str;
 		intervalIndex = strlen(localString) -1;
@@ -84,6 +83,26 @@ public:
 
 		return children[pos]->getPrefixNodeMatching(str);
 
+	}
+
+	void findMatchingLength(int q, vector<PatriciaTrie*> *list) {
+		// omit trailing character
+		if(isLeaf() && intervalIndex ==q)
+			return;
+		if(intervalIndex>=q) {
+			(*list).push_back(this);
+			return;
+		}
+		for(int i =0; i<children.size(); i++) {
+			if(children[i] != NULL) {
+				children[i]->findMatchingLength(q, list);
+			}
+		}
+	}
+
+	string getString(int q){
+		string s(localString);
+		return s.substr(1,q);
 	}
 
 	PatriciaTrie *getPrefixNode(char *str){
@@ -157,7 +176,7 @@ public:
 
 		// update current Node
 		this->setIntervalIndex(diffIndex-1);
-		this->setChildren(createVector()); // empty vector
+		this->setChildren(createVectorUniverse()); // empty vector
 
 		short pos1, pos2;
 		pos1 = getAlphabetIndex(localString[diffIndex]);
@@ -277,7 +296,7 @@ public:
 		parent = t;
 	}
 
-	vector<PatriciaTrie*> createVector(){
+	vector<PatriciaTrie*> createVectorUniverse(){
 		vector<PatriciaTrie*> v;
 		v.resize(conf::univ_size);
 		asserter(v.size() == conf::univ_size, "unexpected {resize on vector not working}");

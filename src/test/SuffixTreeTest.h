@@ -1,6 +1,8 @@
 using namespace std;
+#include <tuple>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 class SuffixTreeTest: public TestSuite {
 public:
@@ -11,15 +13,62 @@ public:
 		testBuild();
 		testCount();
 		testLocate();
+		testTopKQ();
+//		testTextfile();
+	}
+
+	void testTextfile() {
+		setContext(__func__);
+		char *text = "asdj lajsdlfjalsdj a ljasdk jiwem la ijao jlakjod ja 12 12 2  2 2";
+//		conf::universe = conf::english_universe;
+
+		SuffixTree *t = new SuffixTree();
+		t->build(text);
+		t->printTree();
 	}
 
 	void testTopKQ() {
 		setContext(__func__);
 
-		char *text = "abracadabra";
+		char *text = "abracadabraabracadabra";
 		SuffixTree *t = new SuffixTree();
 		t->build(text);
 		t->printTree();
+
+		vector<string> res;
+
+//		char *s = "abracadabraabracadabra";
+		char *s = "a";
+//		vector<string> res = t->topkq(10, strlen(s));
+		vector<pair <string, int> > p;
+		t->topkqTest(100, 1, &p);
+		cout << p.size() << endl;
+		for (int i=0;  i< p.size(); i++) {
+			cout << '<' << p[i].first << ',' << p[i].second << '>' << "-";
+		}
+		cout << endl;
+
+		// test 1 character long,
+		//expected the ∑ alphabeth size
+		res = t->topkq(100, 1);
+		assertTrue(res.size() == 5);
+		// Character 'a' is the most repeated
+		assertTrue(res[0] == "a");
+		// Character 'c' and 'd' are the least one
+		// d is the last lexicographically
+		assertTrue(res[res.size()-1] == "d");
+		assertTrue(res[res.size()-2] == "c");
+
+		// test n = |text|
+		// expected 1, with one occurrence
+		res = t->topkq(100, strlen(text));
+		assertTrue(res.size() == 1);
+		assertTrue(res[0] == text);
+
+		res = t->topkq(100, 100);
+		assertTrue(res.size() == 0);
+
+		// for most visual answers use method SuffixTree::topkqTest method
 	}
 
 	void testLocate() {
@@ -76,6 +125,14 @@ public:
 		assertTrue(s2 == s3);
 //		assertTrue("bd" == s);
 //		assertTrue(s2 == s3);
+
+		string str = "1,2,3,4";
+//		int *ii ==s;
+//		int* pend = strlen(ss);
+//		string s = std::remove(str.begin(), str.end(), 'a');
+		str.erase(std::remove(str.begin(), str.end(), ','), str.end());
+//		cout << "daldsf " << str << endl;
+//		assertTrue("1234" == s);
 	}
 
 	void testBuild() {

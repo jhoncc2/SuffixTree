@@ -28,13 +28,17 @@ using namespace std;
 
 
 // Experiments
-//#include "experiment/BaseExperiment.h"
+#include "experiment/BaseExperiment.h"
+#include "experiment/ExperimentEnglish.h"
 
 // importing utils for pre-computing
 #include "utils/utils.h"
+#include "utils/TextPreprocessing.h"
 #include "utils/command.h"
 
+
 int main (int argc, char *argv[]) {
+	conf::generate_ascii_table();
     // try
     // {
         return console::handlecommands(argc, argv);

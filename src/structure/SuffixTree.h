@@ -1,6 +1,8 @@
+#include <tuple>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <utility>
 
 using namespace std;
 
@@ -47,6 +49,11 @@ public:
 		return cstr;
 	}
 
+	/**
+	 * counts the number of strings
+	 * that match the parameter str
+	 * returns the number of them
+	 */
 	int count(char * str) {
 		PatriciaTrie *t = this->getPrefixNode(str);
 		if(t == NULL)
@@ -55,6 +62,10 @@ public:
 		return t->getNumberOfStrings();
 	}
 
+	/**
+	 * finds the node which match the str char
+	 * return its indices
+	 */
 	vector<int> locate(char *str) {
 		PatriciaTrie *t = this->getPrefixNode(str);
 		if(t == NULL){
@@ -63,6 +74,51 @@ public:
 		}
 
 		return t->getOccurrences();
+	}
+
+	vector<string> topkq(int k, int q) {
+		vector <string> result ;
+		vector <PatriciaTrie*> r;
+		findMatchingLength(q, &r);
+
+		sort(r.begin(), r.end(), SuffixTree::compareTries);
+
+		int size = r.size();
+		int lim = min(k, size);
+//		cout << "found: " << r.size() << endl;
+		for (int i = 0 ; i < lim; i++) {
+			result.push_back(r[i]->getString(q));
+		}
+
+		return result;
+	}
+
+	/**
+	 * Printable version for testing and visual results
+	 */
+	vector<string> topkqTest(int k, int q, vector< pair<string,int> > *l) {
+			vector <string> result ;
+			vector <PatriciaTrie*> r;
+			findMatchingLength(q, &r);
+
+			sort(r.begin(), r.end(), SuffixTree::compareTries);
+
+			int size = r.size();
+			int lim = min(k, size);
+	//		cout << "found: " << r.size() << endl;
+			for (int i = 0 ; i < lim; i++) {
+				pair <string, int> p;
+				p.first = r[i]->getString(q);
+				p.second = r[i]->getNumberOfStrings();
+				l->push_back(p);
+				result.push_back(r[i]->getString(q));
+			}
+
+			return result;
+		}
+
+	static bool compareTries(PatriciaTrie *t1, PatriciaTrie *t2){
+		return (t1->getNumberOfStrings() > t2->getNumberOfStrings());
 	}
 
 	void printTree(){
