@@ -19,19 +19,21 @@ using namespace std;
  *
  */
 
-class SuffixTree {
+class SuffixTree : public PatriciaTrie {
 
 public:
 
-	PatriciaTrie *tree;
-
 	void build(char* text) {
-		tree = new PatriciaTrie();
-		tree->insertString(text);
+//		tree = new PatriciaTrie();
+
 		int end = strlen(text);
+		PatriciaTrie *t = this->insertString(text);
+		t->appendOccurrences(0);
+
 		for (int i = 1; i < strlen(text) ; i ++) {
 			char *sb = substringOf(text, i, end);
-			tree->insertString(sb);
+			t = this->insertString(sb);
+			t->appendOccurrences(i);
 		}
 	}
 
@@ -45,8 +47,26 @@ public:
 		return cstr;
 	}
 
-	void count(char * srt) {
+	int count(char * str) {
+		PatriciaTrie *t = this->getPrefixNode(str);
+		if(t == NULL)
+			return 0;
 
+		return t->getNumberOfStrings();
+	}
+
+	vector<int> locate(char *str) {
+		PatriciaTrie *t = this->getPrefixNode(str);
+		if(t == NULL){
+			vector<int> v;
+			return v;
+		}
+
+		return t->getOccurrences();
+	}
+
+	void printTree(){
+		this->printTrie();
 	}
 
 };

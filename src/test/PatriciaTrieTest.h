@@ -58,6 +58,7 @@ public:
 		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qwe$", 0, 4) == 3);
 		assertTrue(t->findUnmatchedCharIndex("`qwerty`", "`qwe`", 0,8) == 4);
 		assertTrue(t->findUnmatchedCharIndex("`qwe`","`qwerty`",  0,8) == 4);
+		assertTrue(t->findUnmatchedCharIndex("`qwe","`qwerty`",  0,8) == 4);
 
 		cout << "sdafas " << endl;
 
