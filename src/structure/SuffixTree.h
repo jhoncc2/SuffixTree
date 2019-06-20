@@ -25,6 +25,10 @@ class SuffixTree : public PatriciaTrie {
 
 public:
 
+	SuffixTree() : PatriciaTrie() {}
+
+	SuffixTree(char *str) : PatriciaTrie(str) {}
+
 	void build(char * text){
 		buildRange(text, 0, strlen(text));
 	}
