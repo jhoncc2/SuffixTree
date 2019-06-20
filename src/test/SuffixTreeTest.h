@@ -41,7 +41,7 @@ public:
 
 		SuffixTree *t = new SuffixTree();
 //		string chunk = line->substr(0, pow(2,15));
-		t->buildRange(line, 0, pow(2,20));
+		t->buildRange(line, 0, pow(2,17));
 //		t->printTree();
 	}
 

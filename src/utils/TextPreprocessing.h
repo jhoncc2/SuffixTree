@@ -53,9 +53,9 @@ public:
 		// reading content
 		int i = 0;
 		while(getline(file, line)) {
-			if (i > 500)
-				return ;
-			i++;
+//			if (i > 500)
+//				return ;
+//			i++;
 
 			if (line.empty())
 				continue;

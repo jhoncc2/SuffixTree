@@ -35,11 +35,23 @@ using namespace std;
 #include "utils/TextPreprocessing.h"
 #include "utils/command.h"
 
+// resources
+#include <sys/resource.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 int main (int argc, char *argv[]) {
 	// try
     // {
-        return console::handlecommands(argc, argv);
+		struct rusage r_usage;
+
+        int r = console::handlecommands(argc, argv);
+
+        getrusage(RUSAGE_SELF,&r_usage);
+		printf("Memory usage = %ld\n",r_usage.ru_maxrss);
+		return r;
+
     // }
     // catch(const std::exception&)  // Consider using a custom exception type for intentional
     // {                             // throws. A good idea might be a `return_exception`.
