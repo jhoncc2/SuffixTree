@@ -1,7 +1,7 @@
 #include <utility>
 #include <iostream>
 #include <vector>
-#include <string>
+#include <string.h>
 #include <algorithm>
 
 

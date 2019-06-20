@@ -18,7 +18,7 @@ public:
 		cout << "running experiment enlish " <<endl;
 		conf::use_universe(conf::text_universe);
 		char *text = readFile(inputFile);
-		cout <<inputFile << text << endl;
+		// cout <<inputFile << text << endl;
 
 		this->runMultiple(text, outFolder);
 		cout << "finished experiment enlish " <<endl;
@@ -34,7 +34,7 @@ public:
 		file.open(filename.c_str(), ios::in);
 		// reading header [remove]
 		getline(file, line);
-		cout << line << endl;
+		// cout << line << endl;
 		file.close();
 
 		char *cstr = new char[line.length() + 1];
