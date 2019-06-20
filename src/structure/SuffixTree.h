@@ -27,23 +27,27 @@ public:
 
 	SuffixTree() : PatriciaTrie() {}
 
-	SuffixTree(char *str) : PatriciaTrie(str) {}
+	SuffixTree(string *str) : PatriciaTrie(str) {}
 
-	void build(char * text){
-		buildRange(text, 0, strlen(text));
+	void build(string * text){
+		buildRange(text, 0, (*text).length());
 	}
-	void buildRange(char* text, int ini, int limit) {
+	void buildRange(string* text, int ini, int limit) {
 //		tree = new PatriciaTrie();
 		asserter(ini >= 0, "initial index no valid {build suffix tree}");
-		asserter(limit <= strlen(text), "limit no valid {build suffix tree}");
+		asserter(limit <= (*text).length(), "limit no valid {build suffix tree}");
 
-		int end = strlen(text);
+		int end = (*text).length();
+		if (limit < end)
+			end = limit;
 		PatriciaTrie *t = this->insertString(text);
 		t->appendOccurrences(0);
 
-		for (int i = 1; i < strlen(text) ; i ++) {
-			char *sb = substringOf(text, i, end);
-			t = this->insertString(sb);
+		for (int i = 1; i < limit; i ++) {
+//			string *sb = substringOf(text, i, end);
+			string sb = text->substr(i,end-i);
+//			cout << "inserting: " << sb << endl;
+			t = this->insertString(&sb);
 			t->appendOccurrences(i);
 		}
 	}
@@ -63,7 +67,7 @@ public:
 	 * that match the parameter str
 	 * returns the number of them
 	 */
-	int count(char * str) {
+	int count(string * str) {
 		PatriciaTrie *t = this->getPrefixNode(str);
 		if(t == NULL)
 			return 0;
@@ -75,7 +79,7 @@ public:
 	 * finds the node which match the str char
 	 * return its indices
 	 */
-	vector<int> locate(char *str) {
+	vector<int> locate(string *str) {
 		PatriciaTrie *t = this->getPrefixNode(str);
 		if(t == NULL){
 			vector<int> v;

@@ -67,7 +67,7 @@ public:
 			// build suffix tree
 			cout << "processing n=" << size << endl;
 //			output << "processing n=" << size << endl;
-			t->buildRange(text, 0, size);
+//			t->buildRange(text, 0, size);
 			cout << "finished building tree" << endl;
 
 			// run experiments
@@ -130,7 +130,7 @@ public:
 	void runCount(SuffixTree *t, vector<char*> rwords, fstream &out){
 		startTimer();
 		for (int i = 0; i < rwords.size(); i++) {
-			t->count(rwords[i]);
+//			t->count(rwords[i]);
 		}
 		double lapse = stopTimer();
 		out << lapse << "\t" ;
@@ -139,7 +139,7 @@ public:
 	void runLocate(SuffixTree *t, vector<char*> rwords, fstream &out){
 		startTimer();
 		for (int i = 0; i < rwords.size(); i++) {
-			t->locate(rwords[i]);
+//			t->locate(rwords[i]);
 		}
 		double lapse = stopTimer();
 		out << lapse << "\t";

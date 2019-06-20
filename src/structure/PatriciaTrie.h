@@ -29,7 +29,7 @@ public:
 	// local
 	PatriciaTrie *parent;
 
-	char *localString; //
+	string *localString; //
 
 	vector <PatriciaTrie*> children; // children
 	long charIndex, intervalIndex;
@@ -42,18 +42,18 @@ public:
 //		children.resize(conf::univ_size);
 		children = createVectorUniverse();
 
-		localString = "";
+		localString = new string();
 		intervalIndex = 0;
 		charIndex = 0;
 		parent = NULL;
 		numberOfStrings = 0;
 	}
 
-	PatriciaTrie(char *str){
+	PatriciaTrie(string *str){
 		children = createVectorUniverse();
 
 		localString = str;
-		intervalIndex = strlen(localString) -1;
+		intervalIndex = (*localString).length() -1;
 		charIndex = 0;
 		parent = NULL;
 		numberOfStrings = 0;
@@ -63,11 +63,11 @@ public:
 	 * find the prefix {str} in the tree
 	 * returns a Tree node | NULL if not match prefix {str}
 	 */
-	PatriciaTrie *getPrefixNodeMatching(char *str){
+	PatriciaTrie *getPrefixNodeMatching(string *str){
 		// compare localstring with str
 
 		int idx = findUnmatchedCharIndex(localString, str, charIndex, intervalIndex + 1);
-		long strSize = strlen(str);
+		long strSize = (*str).length();
 		if (idx != -1)
 			if (idx == strSize)
 				return this;
@@ -77,7 +77,7 @@ public:
 			if (intervalIndex +1 == strSize)
 				return this;
 
-		long pos = getUniverseIndex(str[intervalIndex +1]);
+		long pos = getUniverseIndex((*str)[intervalIndex +1]);
 		if (children[pos] == NULL)
 			return NULL;
 
@@ -100,71 +100,83 @@ public:
 		}
 	}
 
+	string getNodeString(){
+
+		int lim = intervalIndex -charIndex;
+		lim = min(lim, 10);
+		return (*localString).substr(charIndex, lim);
+	}
+
 	string getString(int q){
-		string s(localString);
-		return s.substr(1,q);
+//		string s(localString);
+		return (*localString).substr(1,q);
 	}
 
-	PatriciaTrie *getPrefixNode(char *str){
-		string s(str);
-		s = string(1,conf::ini_char) + s ;
+	PatriciaTrie *getPrefixNode(string *str){
+		string s = conf::ini_char + (*str);
+//		s = string(1,conf::ini_char) + s ;
 
-		char *cstr = new char[s.length() + 1];
-		strcpy(cstr, s.c_str());
+//		string *cstr = new char[s.length() + 1];
+//		strcpy(cstr, s.c_str());
 
-		return getPrefixNodeMatching(cstr);
+		return getPrefixNodeMatching(&s);
 	}
 
-	PatriciaTrie *insertString(char *strToInsert) {
-		string s(strToInsert);
+	PatriciaTrie *insertString(string *strToInsert) {
+//		string s(strToInsert);
+//
+//		s.append(1, conf::end_char);
+////		s.insert(0, 1, conf::end_char);
+//		s = string(1,conf::ini_char) + s ;
+//
+//		string *cstr = new char[s.length() + 1];
+//		strcpy(cstr, s.c_str());
 
-		s.append(1, conf::end_char);
-//		s.insert(0, 1, conf::end_char);
-		s = string(1,conf::ini_char) + s ;
+		string *s = new string(conf::ini_char + (*strToInsert) + conf::end_char);
+//		cout << strToInsert << *strToInsert << "-" << *s << s << endl;
 
-		char *cstr = new char[s.length() + 1];
-		strcpy(cstr, s.c_str());
-
-		return insertStringInTrie(cstr);
+		return insertStringInTrie(s);
 	}
 
 	/**
 	 * only called by the root node
 	 */
-	PatriciaTrie *insertStringInTrie(char *str){
-		if (strlen(localString) == 0) {
+	PatriciaTrie *insertStringInTrie(string *str){
+		if ((*localString).length() == 0) {
 			this->setLocalString(str);
-			this->setIntervalIndex(strlen(str)-1);
+			this->setIntervalIndex((*str).length()-1);
 			this->increaseNumberOfStrings();
 			return this;
 		}
 
 		PatriciaTrie *t = this->findLongestPrefixNode(str);
-
 		return t->bifurcate(str);
 	}
 
-	PatriciaTrie *bifurcate(char *str) {
+	PatriciaTrie *bifurcate(string *str) {
 		long diffIndex = getUnmatchedChar(str);
 		// Already in trie
 		if (diffIndex == -1){
-			if (isLeaf() && strlen(str) == strlen(localString)){
+			if (isLeaf() && (*str).length() == (*localString).length()){
 				return this;
-				cout << "already inserted" << endl;
 			}
 
-//			if(strlen(localString) < strlen(str)){
-//				char *tmp = str;
+//			if((*localString).length() < (*str).length()){
+//				string *tmp = str;
 //				str = localString;
 //				localString = tmp;
 //			}
 
-			long pos = getUniverseIndex(str[intervalIndex+1]);
+			long pos = getUniverseIndex((*str)[intervalIndex+1]);
+
 			if (children[pos] == NULL) {
-				PatriciaTrie *t = createNewTrie(str, intervalIndex+1, strlen(str)-1);
+				PatriciaTrie *t = createNewTrie(str, intervalIndex+1, (*str).length()-1);
 				return insertChildren(pos, t);
 			}
 		}
+//		cout << "bifurcating2: " << *str << " " << (*str)[intervalIndex+1] << endl;
+//		long pos = getUniverseIndex((*str)[intervalIndex+1]);
+
 
 		// bifurcate
 		PatriciaTrie *t1 = createNewTrie(localString, diffIndex, intervalIndex);
@@ -172,15 +184,15 @@ public:
 		t1->setOccurrences(occurrences);
 		t1->setNumberOfStrings(this->getNumberOfStrings());
 
-		PatriciaTrie *t2 = createNewTrie(str, diffIndex, strlen(str)-1);
+		PatriciaTrie *t2 = createNewTrie(str, diffIndex, (*str).length()-1);
 
 		// update current Node
 		this->setIntervalIndex(diffIndex-1);
 		this->setChildren(createVectorUniverse()); // empty vector
 
 		long pos1, pos2;
-		pos1 = getUniverseIndex(localString[diffIndex]);
-		pos2 = getUniverseIndex(str[diffIndex]);
+		pos1 = getUniverseIndex((*localString)[diffIndex]);
+		pos2 = getUniverseIndex((*str)[diffIndex]);
 		this->insertChildrenSilently(pos1, t1);
 		this->insertChildren(pos2, t2);
 
@@ -188,14 +200,30 @@ public:
 	}
 
 	PatriciaTrie *insertChildren(long idx, PatriciaTrie *t) {
-		asserter(children[idx] == NULL, "already exists element at " + to_string(idx));
+		asserter(idx >=0 && idx < children.size() , "index out of bounds { " + to_string(idx));
+		if(children[idx] != NULL) {
+			this->printSubstring();
+			t->printSubstring();
+		}
+		asserter(children[idx] == NULL, "already exists element at "
+									+ to_string(idx) + "\n"
+									+ " " + to_string(charIndex) + "- " + to_string(intervalIndex) + "\n"
+									+ " " + getNodeString() + "\n"
+									+ " " + t->getNodeString()
+									);
 		children[idx] = t;
 		t->increaseNumberOfStrings();
 		return t;
 	}
 
 	PatriciaTrie *insertChildrenSilently(long idx, PatriciaTrie *t) {
-		asserter(children[idx] == NULL, "silent - already exists element at " + to_string(idx));
+		asserter(idx >=0 && idx < children.size() , "index out of bounds { " + to_string(idx));
+		asserter(children[idx] == NULL, "silent - already exists element at "
+								+ to_string(idx)
+								+ " " + to_string(charIndex)
+								+ " " + getNodeString()
+								+ " " + t->getNodeString()
+								);
 		children[idx] = t;
 		return t;
 	}
@@ -241,16 +269,23 @@ public:
 
 	string nodeSubstring() {
 		string s = "";
-		for (int i = charIndex; i<=intervalIndex; i++)
-			s = s + localString[i];
+		int limit = intervalIndex;
+		limit = min(limit, 50);
 
+		for (int i = 0; i<=limit; i++)
+			s = s + (*localString)[i];
+
+		if (limit < intervalIndex) {
+			s+= "...";
+		}
 		return s;
+//		return *localString;
 	}
 
 	/**
 	 * Each node leaf poins at the last char of the string
 	 */
-	PatriciaTrie *createNewTrie(char *str, long idx, long intervalIndex) {
+	PatriciaTrie *createNewTrie(string *str, long idx, long intervalIndex) {
 		PatriciaTrie *t = new PatriciaTrie(str);
 		t->setCharIndex(idx);
 		t->setIntervalIndex(intervalIndex);
@@ -265,21 +300,21 @@ public:
 		intervalIndex = ic;
 	}
 
-	long getUnmatchedChar(char *str) {
+	long getUnmatchedChar(string *str) {
 		return findUnmatchedCharIndex(localString, str, charIndex, intervalIndex+1);
 	}
 
-	PatriciaTrie *findLongestPrefixNode(char *str) {
+	PatriciaTrie *findLongestPrefixNode(string *str) {
 		// ensure the interval i-e are equals with str, then call recursive
 
 		// next different character
-		if(intervalIndex < strlen(str)
-			&& str[intervalIndex] == localString[intervalIndex]) {
-			if(intervalIndex + 1 < strlen(str)
-				&& children[getUniverseIndex(str[intervalIndex + 1])] != NULL
+		if(intervalIndex < (*str).length()
+			&& (*str)[intervalIndex] == (*localString)[intervalIndex]) {
+			if(intervalIndex + 1 < (*str).length()
+				&& children[getUniverseIndex((*str)[intervalIndex + 1])] != NULL
 				&& this->getUnmatchedChar(str) == -1){
 
-				return children[getUniverseIndex(str[intervalIndex + 1])]->findLongestPrefixNode(str);
+				return children[getUniverseIndex((*str)[intervalIndex + 1])]->findLongestPrefixNode(str);
 			}
 		}
 
@@ -310,8 +345,8 @@ public:
 	 */
 	long getUniverseIndex(char a) {
 		int index = conf::universe_descriptor[(int) a];
-		conf::universe.size();
-		asserter(index >=0 && index < conf::universe.length(), "character not in universe :" + a);
+		asserter(index >=0 && index < conf::universe.length(), ("character not in universe :" + to_string(a)) );
+//		cout << a << " index found " << index<< endl;
 		return index;
 	}
 
@@ -322,7 +357,7 @@ public:
 		return ((short)a) - conf::char_diff;
 	}
 
-	void setLocalString(char *str) {
+	void setLocalString(string *str) {
 //		strcpy(localString, str.c_str());
 		localString = str;
 	}
@@ -350,19 +385,20 @@ public:
 	 * return the char index that does not match between strings a and b
 	 * if a is shorter than end then returns the size of the string (analogous for b)
 	 */
-	long findUnmatchedCharIndex(string stra, string strb, long ini, long end) {
+	long findUnmatchedCharIndex(string *stra, string *strb, long ini, long end) {
 		long res = -1; // completely equals
 		long limit = end;
-		if(limit > stra.size()) {
-			limit = stra.size();
-			if (stra.size() > strb.size())
-				limit = strb.size();
+		if(limit > (*stra).size()) {
+			limit = (*stra).size();
+			if ((*stra).size() > (*strb).size())
+				limit = (*strb).size();
 			res = limit; // one string is shorter for the comparison
 		}
 
 		for(long i = ini; i < limit; i ++) {
-			if(stra [i] != strb[i]) {
-				return i;
+			if((*stra)[i] != (*strb)[i]) {
+				res = i;
+				return res;
 			}
 		}
 		return res;
@@ -372,7 +408,7 @@ public:
 
 	/** Interaction **/
 	bool isLeaf(){
-		return localString[intervalIndex] == conf::end_char;
+		return (*localString)[intervalIndex] == conf::end_char;
 	}
 
 	bool isRoot(){

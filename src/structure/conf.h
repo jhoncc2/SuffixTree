@@ -18,6 +18,7 @@ namespace conf  {
     // universe = visible universe + end_char
     string universe;
 
+    int universe_descriptor_size = 127;
     int universe_descriptor[127];
 
     int find_index_in_universe(string univ, char c) {

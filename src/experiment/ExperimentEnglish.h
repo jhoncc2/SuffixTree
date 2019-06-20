@@ -17,33 +17,29 @@ public:
 
 		cout << "running experiment enlish " <<endl;
 		conf::use_universe(conf::text_universe);
-		char *text = readFile(inputFile);
+		string line = "";
+		readFile(inputFile, &line);
 		// cout <<inputFile << text << endl;
 
-		this->runMultiple(text, outFolder);
+		this->runMultiple(&line, outFolder);
 		cout << "finished experiment enlish " <<endl;
 	}
 
 	/**
-	 * read first line of a inputfile
-	 * expected single line text
-	 */
-	char* readFile(string filename){
+		 * read first line of a inputfile
+		 * expected single line text
+		 */
+	void readFile(string filename, string *line){
 		ifstream file;
-		string line;
 		file.open(filename.c_str(), ios::in);
 		// reading header [remove]
-		getline(file, line);
-		// cout << line << endl;
+		getline(file, *line);
 		file.close();
 
-		char *cstr = new char[line.length() + 1];
-		strcpy(cstr, line.c_str());
-
-		return cstr;
+//		return cstr;
 	}
 
-	void runMultiple(char *text, string outFolder) {
+	void runMultiple(string *text, string outFolder) {
 		fstream output;
 		string filename = outFolder + "englishCountLocate.txt";
 		output.open(filename, ios::out);
@@ -61,7 +57,7 @@ public:
 			t = new SuffixTree();
 
 			int size = pow(2,i);
-			if (size >= strlen(text) ){
+			if (size >= (*text).length() ){
 				break;
 			}
 
@@ -118,48 +114,53 @@ public:
 		return sum;
 	}
 
-	void runCountAndLocate(SuffixTree *t, char* text, int n, fstream &out){
+	void runCountAndLocate(SuffixTree *t, string *text, int n, fstream &out){
 		// for locate and riun
-		vector<char*> rwords = findRandom(text, n/10);
+		vector<pair<int,int> > rwords = findRandom(text, n/10);
 		out << n << "\t" ;
-		runCount(t, rwords, out);
-		runLocate(t, rwords, out);
+		runCount(t, rwords, text, out);
+		runLocate(t, rwords, text, out);
 		out << endl;
 	}
 
-	void runCount(SuffixTree *t, vector<char*> rwords, fstream &out){
+	void runCount(SuffixTree *t, vector<pair<int,int> > rwords, string *text, fstream &out){
 		startTimer();
 		for (int i = 0; i < rwords.size(); i++) {
-			t->count(rwords[i]);
+			string s = text->substr(rwords[i].first, rwords[i].second);
+			t->count(&s);
 		}
 		double lapse = stopTimer();
 		out << lapse << "\t" ;
 	}
 
-	void runLocate(SuffixTree *t, vector<char*> rwords, fstream &out){
+	void runLocate(SuffixTree *t, vector<pair<int,int> > rwords, string *text, fstream &out){
 		startTimer();
 		for (int i = 0; i < rwords.size(); i++) {
-			t->locate(rwords[i]);
+			string s = text->substr(rwords[i].first, rwords[i].second);
+			t->locate(&s);
 		}
+
 		double lapse = stopTimer();
 		out << lapse << "\t";
 	}
 
-	vector <char*> findRandom(char *text, int size) {
-		vector<char*> res;
-		int tlenght = strlen(text);
-		int rval, ini, end;
+	vector <pair<int, int> > findRandom(string *text, int size) {
+		vector<pair<int,int> > res;
+		int tlenght = (*text).length();
+		int rval;
+
 		for (int i = 0; i < size; i++) {
-			ini = rand() % tlenght;
-			while(text[ini] != ' ')
-				ini++;
-			ini ++;
-			end = ini;
+			pair<int, int> p;
+			p.first = rand() % tlenght;
+			while((*text)[p.first] != ' ')
+				p.first++;
+			p.first ++;
+			p.second = 0;
 
-			while(text[end] != ' ')
-				end++;
+			while((*text)[p.first + p.second] != ' ' && p.second < 30)
+				p.second++;
 
-			res.push_back(substringOf(text, ini, end-ini));
+			res.push_back(p);
 		}
 		return res;
 	}

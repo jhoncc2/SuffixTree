@@ -28,6 +28,7 @@ public:
 	}
 
 	void loadAndRemoveChars(string filename, string outfilename) {
+		conf::use_universe(conf::text_universe);
 		string line;
 		// open
 		ifstream file;
@@ -50,7 +51,12 @@ public:
 		getline(file, line);
 
 		// reading content
+		int i = 0;
 		while(getline(file, line)) {
+			if (i > 500)
+				return ;
+			i++;
+
 			if (line.empty())
 				continue;
 //			cout << line << endl;
@@ -69,16 +75,20 @@ public:
 //		int *whiteList= &conf::ascii table;
 		string res = "";
 		char tc;
+		int idx;
 		for(int i=0; i< str.size(); i ++){
 			tc = str[i];
-			if(tc > 64  && tc<91) //
+			if(tc > 64  && tc<91) //lower_case
 				tc = tc + 32;
 
 			if(str[i] == ' ' && i != str.size()-1 && str[i] == str[i+1]) {
 				continue;
 			}
 
-			if (conf::universe[(int)tc] != -1)
+			idx = (int)tc;
+			if (
+					idx>=0 && idx < conf::universe_descriptor_size
+					&& conf::universe_descriptor[idx] != -1 )
 				res += tc;
 		}
 		return res;

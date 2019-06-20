@@ -5,6 +5,7 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <math.h>
 
 class SuffixTreeTest: public TestSuite {
 public:
@@ -23,21 +24,24 @@ public:
 
 	void build50MBTree(){
 		setContext(__func__);
-		string *line;
 		string filename = "/Users/jhonc/Workspace/algo/datasets/english_50MB_out.txt";
-		char *l = readFile(filename);
 
-//		string *line = new string();
-//		readFile2(filename, line);
+//		string *line;
+//		char *l = readFile(filename);
+
+		string *line = new string();
+		readFile2(filename, line);
+
 //		cout << (*line).substr(0,500) << endl;
 //		string *s2 = line;
 //		cout << s2 << "-" << line  << endl;
 
-		char *text = "asdj lajsdlfjalsdj a ljasdk jiwem la ijao jlakjod ja 12 12 2  2 2";
+		string text = "asdj lajsdlfjalsdj a ljasdk jiwem la ijao jlakjod ja 12 12 2  2 2";
 		conf::use_universe(conf::text_universe);
 
 		SuffixTree *t = new SuffixTree();
-		t->build(l);
+//		string chunk = line->substr(0, pow(2,15));
+		t->buildRange(line, 0, pow(2,20));
 //		t->printTree();
 	}
 
@@ -51,11 +55,7 @@ public:
 		file.open(filename.c_str(), ios::in);
 		// reading header [remove]
 		getline(file, *line);
-		 cout << line << endl;
 		file.close();
-
-		char *cstr = new char[(*line).length() + 1];
-		strcpy(cstr, (*line).c_str());
 
 //		return cstr;
 	}
@@ -81,20 +81,20 @@ public:
 
 	void testTextfile() {
 		setContext(__func__);
-		char *text = "asdj lajsdlfjalsdj a ljasdk jiwem la ijao jlakjod ja 12 12 2  2 2";
+		string text = "asdj lajsdlfjalsdj a ljasdk jiwem la ijao jlakjod ja 12 12 2  2 2";
 		conf::use_universe(conf::text_universe);
 
 		SuffixTree *t = new SuffixTree();
-		t->build(text);
+		t->build(&text);
 		t->printTree();
 	}
 
 	void testTopKQ() {
 		setContext(__func__);
 
-		char *text = "abracadabraabracadabra";
+		string text = "abracadabraabracadabra";
 		SuffixTree *t = new SuffixTree();
-		t->build(text);
+		t->build(&text);
 		t->printTree();
 
 		vector<string> res;
@@ -123,7 +123,7 @@ public:
 
 		// test n = |text|
 		// expected 1, with one occurrence
-		res = t->topkq(100, strlen(text));
+		res = t->topkq(100, text.length());
 		assertTrue(res.size() == 1);
 		assertTrue(res[0] == text);
 
@@ -135,32 +135,36 @@ public:
 
 	void testLocate() {
 		setContext(__func__);
-		char *text = "abracadabra";
+		string text = "abracadabra";
 
 		SuffixTree *t = new SuffixTree();
-		t->build(text);
+		t->build(&text);
 		t->printTree();
 
 		// individual test
 		int myints[] = {0,3,5,7,10};
 		std::vector<int> x (myints, myints + sizeof(myints) / sizeof(int) );
-		vector <int>res =  t->locate("a");
+		string str = "a";
+		vector <int>res =  t->locate(&str);
 		assertTrue(res == x);
 
 		int myints2[] = {1,8};
 		std::vector<int> x2 (myints2, myints2 + sizeof(myints2) / sizeof(int) );
-		res =  t->locate("br");
+		str = "br";
+		res =  t->locate(&str);
 		assertTrue(res == x2);
 
 
 		int myints3[] = {};
 		std::vector<int> x3 (myints3, myints3 + sizeof(myints3) / sizeof(int) );
-		res =  t->locate("z");
+		str = "z";
+		res =  t->locate(&str);
 		assertTrue(res == x3);
 
 		int myints4[] = {0};
 		std::vector<int> x4 (myints4, myints4 + sizeof(myints4) / sizeof(int) );
-		res =  t->locate("abracadabra");
+		str = "abracadabra";
+		res =  t->locate(&str);
 		assertTrue(res == x4);
 
 //		assertTrue(t->count("r") == 2);
@@ -201,35 +205,43 @@ public:
 		setContext(__func__);
 
 		// alph
-		char *alph = getAlphabeth();
-		assertTrue(strlen(alph) == 26);
+		string alph = getAlphabeth();
+		assertTrue(alph.length() == 26);
 		SuffixTree *t = new SuffixTree();
-		t->build(alph);
+		t->build(&alph);
 		t->printTree();
 
 		// dna
-		char *dna100 = getSequence100();
+		string dna100 = getSequence100();
 		t = new SuffixTree();
-		t->build(dna100);
+		t->build(&dna100);
 //		t->printTree();
 	}
 
 	void testCount() {
 		setContext(__func__);
-		char *text = "abracadabra";
+		string text = "abracadabra";
 
 		SuffixTree *t = new SuffixTree();
-		t->build(text);
+		t->build(&text);
 		t->printTree();
+		string str = "a";
+		assertTrue(t->count(&str) == 5);
+		str= "r";
+		assertTrue(t->count(&str) == 2);
+		str= "ca";
+		assertTrue(t->count(&str) == 1);
+		str= "bra";
+		assertTrue(t->count(&str) == 2);
+		str= "ab";
+		assertTrue(t->count(&str) == 2);
+		str= "abracadabra";
+		assertTrue(t->count(&str) == 1);
+		str= "abracadabras";
+		assertTrue(t->count(&str) == 0);
+		str= "abracadabre";
+		assertTrue(t->count(&str) == 0);
 
-		assertTrue(t->count("a") == 5);
-		assertTrue(t->count("r") == 2);
-		assertTrue(t->count("ca") == 1);
-		assertTrue(t->count("bra") == 2);
-		assertTrue(t->count("ab") == 2);
-		assertTrue(t->count("abracadabra") == 1);
-		assertTrue(t->count("abracadabras") == 0);
-		assertTrue(t->count("abracadabre") == 0);
 	}
 
 	char* getSequence100() {

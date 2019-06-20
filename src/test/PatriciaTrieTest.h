@@ -33,6 +33,7 @@ public:
 		for (int i =0; i < list.size(); i ++)
 			assertTrue(list[i] == NULL);
 
+
 //		cout << &(str2[0]) << "-" << &(str[0])  << endl;
 //		cout << &str2 << "-" << &str  << endl;
 
@@ -54,16 +55,16 @@ public:
 //		cout << (int) 'z' << endl;
 
 		PatriciaTrie *t = new PatriciaTrie();
-		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qwerty$", 0, 6) == -1);
-		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qw2rty$", 0, 6) == 2);
-		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qwe$", 0, 6) == 3);
-		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qwe$", 0, 3) == -1);
-		assertTrue(t->findUnmatchedCharIndex("qwerty$", "qwe$", 0, 4) == 3);
-		assertTrue(t->findUnmatchedCharIndex("`qwerty`", "`qwe`", 0,8) == 4);
-		assertTrue(t->findUnmatchedCharIndex("`qwe`","`qwerty`",  0,8) == 4);
-		assertTrue(t->findUnmatchedCharIndex("`qwe","`qwerty`",  0,8) == 4);
 
-
+		assertTrue(t->findUnmatchedCharIndex(getNSP("qwerty$"),getNSP("qwerty$"), 0, 6) == -1);
+		assertTrue(t->findUnmatchedCharIndex(getNSP("qwerty$"),getNSP("qw2rty$"), 0, 6) == 2);
+		assertTrue(t->findUnmatchedCharIndex(getNSP("qwerty$"),getNSP("qwe$"), 0, 6) == 3);
+		assertTrue(t->findUnmatchedCharIndex(getNSP("qwerty$"),getNSP("qwe$"), 0, 3) == -1);
+		assertTrue(t->findUnmatchedCharIndex(getNSP("qwerty$"),getNSP("qwe$"), 0, 4) == 3);
+		assertTrue(t->findUnmatchedCharIndex(getNSP("`qwerty`"),getNSP("`qwe`"), 0,8) == 4);
+		assertTrue(t->findUnmatchedCharIndex(getNSP("`qwe`"),getNSP("`qwerty`"),  0,8) == 4);
+		assertTrue(t->findUnmatchedCharIndex(getNSP("`qwe"),getNSP("`qwerty`"),  0,8) == 4);
+		assertTrue(t->findUnmatchedCharIndex(getNSP("$romane`"),getNSP("$ruber`"), 0, 3) == 2);
 
 		// context alphabet universe
 		assertTrue(conf::universe_descriptor[(int)'a'] == 0);
@@ -81,38 +82,49 @@ public:
 		assertTrue(t->numberOfNodes() == 1); //root
 		assertTrue(t->getWidth() == 0);
 
-		t->insertString("romane");
+		t->insertString(getNSP("romane"));
+		assertTrue(t->numberOfNodes() == 1);
+		assertTrue(t->getNumberOfStrings() == 1);
 
+		t->insertString(getNSP("romane")); //already inserted
 		assertTrue(t->numberOfNodes() == 1);
 		assertTrue(t->getNumberOfStrings() == 1);
-		t->insertString("romane"); //already inserted
-		assertTrue(t->numberOfNodes() == 1);
-		assertTrue(t->getNumberOfStrings() == 1);
-//		//
-		t->insertString("romanus");
+		//		//
+
+
+		t->insertString(getNSP("romanus"));
+		t->printTrie();
 		assertTrue(t->numberOfNodes() == 3);
 		assertTrue(t->getNumberOfStrings() == 2);
-		t->insertString("romulus");
+		cout << "djsfksldf" << endl;
+
+		t->insertString(getNSP("romulus"));
 		assertTrue(t->getNumberOfStrings() == 3);
-		t->insertString("rubens");
+
+		t->insertString(getNSP("rubens"));
 		assertTrue(t->getNumberOfStrings() == 4);
-		t->insertString("rubenson");
+
+		t->insertString(getNSP("rubenson"));
 		assertTrue(t->getNumberOfStrings() == 5);
-		t->insertString("ruber");
+		t->printTrie();
+		t->insertString(getNSP("ruber"));
 		assertTrue(t->getNumberOfStrings() == 6);
-		t->insertString("rubicon");
+
+		t->insertString(getNSP("rubicon"));
 		assertTrue(t->getNumberOfStrings() == 7);
-		t->insertString("rubicundus");
+
+		t->insertString(getNSP("rubicundus"));
 		assertTrue(t->getNumberOfStrings() == 8);
-//		t->printTrie();
-		t->insertString("ruba");
+		t->insertString(getNSP("ruba"));
 		assertTrue(t->getNumberOfStrings() == 9);
-		t->insertString("rub");
+		t->insertString(getNSP("rub"));
 		assertTrue(t->getNumberOfStrings() == 10);
 
-		t->insertString("pub");
+
+		t->insertString(getNSP("pub"));
 		assertTrue(t->getNumberOfStrings() == 11);
-		t->insertString("pop");
+
+		t->insertString(getNSP("pop"));
 		assertTrue(t->getNumberOfStrings() == 12);
 
 		t->printTrie();
@@ -120,5 +132,11 @@ public:
 //		cout << t->getWidth() <<endl;
 		assertTrue(t->getWidth() == 12);
 		assertTrue(t->getNumberOfStrings() == 12);
+	}
+
+	string *getNSP(string st) {
+		string *str = new string(st);
+		cout << str << endl;
+		return str;
 	}
 };
