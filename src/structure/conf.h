@@ -17,6 +17,7 @@ namespace conf  {
 
     // visible universe
     string alph_universe = "abcdefghijklmnopqrstuvwxyz";
+    string dna_universe = "GTCA";
     string text_universe = " 0123456789abcdefghijklmnopqrstuvwxyz";
 
     // universe = visible universe + end_char

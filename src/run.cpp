@@ -30,6 +30,7 @@ using namespace std;
 // Experiments
 #include "experiment/BaseExperiment.h"
 #include "experiment/ExperimentEnglish.h"
+#include "experiment/ExperimentDNA.h"
 
 // importing utils for pre-computing
 #include "utils/utils.h"

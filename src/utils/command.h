@@ -52,6 +52,10 @@ namespace console{
 
 			if (type == "english")
 				(new ExperimentEnglish())->run(data, output);
+			else if (type == "english")
+				(new ExperimentDNA())->run(data, output);
+			else
+				cout << "experiment not found: " << type << endl;
 
 		} else if (exist(argv, argv + argc, "--exp-random")) {
 	//        (new RandomExperiment())->run();

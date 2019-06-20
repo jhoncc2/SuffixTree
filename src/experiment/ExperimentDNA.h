@@ -8,20 +8,20 @@ using namespace std;
 
 
 
-class ExperimentEnglish : public BaseExperiment {
+class ExperimentDNA : public BaseExperiment {
 
 public:
 
 	void run(string inputFile, string outFolder) {
 		// configuration of sencond memory
 
-		cout << "running experiment enlish " <<endl;
-		conf::use_universe(conf::text_universe);
+		cout << "running experiment dna " <<endl;
+		conf::use_universe(conf::dna_universe);
 		char *text = readFile(inputFile);
-		cout <<inputFile << text << endl;
+		cout << inputFile << text << endl;
 
 		this->runMultiple(text, outFolder);
-		cout << "finished experiment enlish " <<endl;
+		cout << "finished experiment dna " <<endl;
 	}
 
 	/**
@@ -47,7 +47,6 @@ public:
 		fstream output;
 		string filename = outFolder + "englishCountLocate.txt";
 		output.open(filename, ios::out);
-		output << "n \t Count \t Locate " << endl;
 
 		fstream outputTop;
 		string filename2 = outFolder + "englishTopkq.txt";
@@ -72,6 +71,7 @@ public:
 			cout << "finished building tree" << endl;
 
 			// run experiments
+			output << "n \t Count \t Locate " << endl;
 			runCountAndLocate(t, text, size, output);
 			runTopkq(t, size, outputTop);
 		}

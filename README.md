@@ -1,28 +1,31 @@
-# **Implementation of RTree**
-
+# SuffixTree
 
 Compile:
 ```
 >  g++ main.cpp -std=c++11 -o run.out
 ```
+
+### Testing
+
+```
+./output.out --testing
+```
+
+### English remove unnecessary characters
+```
+./output --clearText --finput /DirectoryToInput/english_eg.rtf --foutput /DirectoryToOuptut/english_eg_out.txt
+```
+
+
 ### Experiment Commands
-
-- Run experiment with edges and times, configurable.
-
-```
-./output.out --experiment --times 10 --edges 10
-```
-
-- Run experiment with edges preconfigured: 10, 100, 1000. And times as parameter.
+-- English dataset Experiment
 
 ```
-./output.out --allExperiments --times 10
+./output --run-experiment english --out-folder  /OutputDirectory/ --data /DirectoryToData/english.txt
 ```
 
-### Extra Commands
-
-- Run tests
+-- English dataset Experiment
 
 ```
-./output.out --allExperiments --runTests
+./output --run-experiment dna --out-folder  /OutputDirectory/ --data /DirectoryToData/dna.txt
 ```
