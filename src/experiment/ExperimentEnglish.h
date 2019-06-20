@@ -114,10 +114,11 @@ public:
 		return sum;
 	}
 
-	void runCountAndLocate(SuffixTree *t, string *text, int n, fstream &out){
+	void runCountAndLocate(SuffixTree *t, string *text, int n, fstream &out) {
 		// for locate and riun
 		vector<pair<int,int> > rwords = findRandom(text, n/10);
-		out << n << "\t" ;
+		cout << "random input selected" << endl;
+		out << n << "\t";
 		runCount(t, rwords, text, out);
 		runLocate(t, rwords, text, out);
 		out << endl;
@@ -151,13 +152,15 @@ public:
 
 		for (int i = 0; i < size; i++) {
 			pair<int, int> p;
-			p.first = rand() % tlenght;
+			p.first = rand() % (tlenght-30);
 			while((*text)[p.first] != ' ')
 				p.first++;
 			p.first ++;
 			p.second = 0;
 
-			while((*text)[p.first + p.second] != ' ' && p.second < 30)
+			while((*text)[p.first + p.second] != ' '
+					&& p.second < tlenght
+					&& p.second < 30)
 				p.second++;
 
 			res.push_back(p);
