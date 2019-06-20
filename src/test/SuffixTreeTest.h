@@ -23,15 +23,21 @@ public:
 
 	void build50MBTree(){
 		setContext(__func__);
-		string *line ;
-		string filename = "/Users/jhonc/Workspace/algo/datasets/english_50MB";
-		readFile(filename, line);
-		cout << (*line).substr(0, 500) << endl;
+		string *line;
+		string filename = "/Users/jhonc/Workspace/algo/datasets/english_50MB_out.txt";
+		char *l = readFile(filename);
+
+//		string *line = new string();
+//		readFile2(filename, line);
+//		cout << (*line).substr(0,500) << endl;
+//		string *s2 = line;
+//		cout << s2 << "-" << line  << endl;
+
 		char *text = "asdj lajsdlfjalsdj a ljasdk jiwem la ijao jlakjod ja 12 12 2  2 2";
 		conf::use_universe(conf::text_universe);
 
 		SuffixTree *t = new SuffixTree();
-//		t->build(line);
+		t->build(l);
 //		t->printTree();
 	}
 
@@ -39,19 +45,38 @@ public:
 	 * read first line of a inputfile
 	 * expected single line text
 	 */
-	void readFile(string filename, string *line){
+	void readFile2(string filename, string *line){
 		ifstream file;
 //		string line;
 		file.open(filename.c_str(), ios::in);
 		// reading header [remove]
 		getline(file, *line);
+		 cout << line << endl;
+		file.close();
+
+		char *cstr = new char[(*line).length() + 1];
+		strcpy(cstr, (*line).c_str());
+
+//		return cstr;
+	}
+
+	/**
+	 * read first line of a inputfile
+	 * expected single line text
+	 */
+	char* readFile(string filename){
+		ifstream file;
+		string line;
+		file.open(filename.c_str(), ios::in);
+		// reading header [remove]
+		getline(file, line);
 		// cout << line << endl;
 		file.close();
 
-//		char *cstr = new char[line.length() + 1];
-//		strcpy(cstr, line.c_str());
-//
-//		return cstr;
+		char *cstr = new char[line.length() + 1];
+		strcpy(cstr, line.c_str());
+
+		return cstr;
 	}
 
 	void testTextfile() {
