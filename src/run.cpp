@@ -14,7 +14,6 @@ using namespace std;
 //src
 #include "structure/conf.h"
 #include "structure/TrieAbstract.h"
-#include "structure/PatriciaTree.h"
 #include "structure/PatriciaTrie.h"
 #include "structure/SuffixTree.h"
 
@@ -22,7 +21,6 @@ using namespace std;
 #include "test/TestException.h"
 #include "test/TestSuite.h"
 #include "test/TestBasic.h"
-#include "test/PatriciaTreeTest.h"
 #include "test/SuffixTreeTest.h"
 #include "test/PatriciaTrieTest.h"
 

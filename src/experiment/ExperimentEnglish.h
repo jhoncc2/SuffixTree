@@ -66,7 +66,7 @@ public:
 			}
 
 			// build suffix tree
-			cout << "processing n=" << size << endl;
+			cout << "processing n=" << size << " i=" << i << endl;
 //			output << "processing n=" << size << endl;
 			t->buildRange(text, 0, size);
 			cout << "finished building tree" << endl;

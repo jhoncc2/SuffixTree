@@ -50,7 +50,7 @@ public:
 	}
 
 	PatriciaTrie(char *str){
-		children.resize(conf::univ_size);
+		children = createVectorUniverse();
 
 		localString = str;
 		intervalIndex = strlen(localString) -1;
@@ -309,7 +309,10 @@ public:
 	 * universe is configured in file conf
 	 */
 	long getUniverseIndex(char a) {
-		return conf::universe_descriptor[(short) a];
+		int index = conf::universe_descriptor[(int) a];
+		conf::universe.size();
+		asserter(index >=0 && index < conf::universe.length(), "character not in universe :" + a);
+		return index;
 	}
 
 	/**

@@ -2,6 +2,8 @@ using namespace std;
 #include <tuple>
 #include <string>
 #include <vector>
+#include <iostream>
+#include <fstream>
 #include <algorithm>
 
 class SuffixTreeTest: public TestSuite {
@@ -16,6 +18,40 @@ public:
 		testLocate();
 		testTopKQ();
 		testTextfile();
+		build50MBTree();
+	}
+
+	void build50MBTree(){
+		setContext(__func__);
+		string *line ;
+		string filename = "/Users/jhonc/Workspace/algo/datasets/english_50MB";
+		readFile(filename, line);
+		cout << (*line).substr(0, 500) << endl;
+		char *text = "asdj lajsdlfjalsdj a ljasdk jiwem la ijao jlakjod ja 12 12 2  2 2";
+		conf::use_universe(conf::text_universe);
+
+		SuffixTree *t = new SuffixTree();
+//		t->build(line);
+//		t->printTree();
+	}
+
+	/**
+	 * read first line of a inputfile
+	 * expected single line text
+	 */
+	void readFile(string filename, string *line){
+		ifstream file;
+//		string line;
+		file.open(filename.c_str(), ios::in);
+		// reading header [remove]
+		getline(file, *line);
+		// cout << line << endl;
+		file.close();
+
+//		char *cstr = new char[line.length() + 1];
+//		strcpy(cstr, line.c_str());
+//
+//		return cstr;
 	}
 
 	void testTextfile() {
